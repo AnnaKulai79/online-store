@@ -23,7 +23,7 @@ CREATE TABLE orders1 (
 );
 
 -- таблиця позицій у замовленні
-CREATE TABLE order_items1 (
+CREATE TABLE orders_items1 (
   order_id INTEGER 
   REFERENCES orders1(id) ON DELETE CASCADE,
   product_id INTEGER 
@@ -45,8 +45,8 @@ INSERT INTO customers1 (name, email, city) VALUES
   ('Taras', 'taras@example.com', 'Lviv'),
   ('Iryna', 'iryna@example.com', 'Odesa');
 
-INSERT INTO orders1 (customer_id) VALUES (1),
-INSERT INTO orders1 (customer_id) VALUES (3),
+INSERT INTO orders1 (customer_id) VALUES (1);
+INSERT INTO orders1 (customer_id) VALUES (3);
 INSERT INTO orders1 (customer_id) VALUES (3);
 
 INSERT INTO orders_items1 (order_id, product_id, quantity) VALUES
@@ -109,3 +109,16 @@ VALUES
 COMMIT; 
 
 --Створіть view, яке показує кількість замовлень і витрати клієнтів.
+CREATE OR REPLACE VIEW vw_customer_orders_count AS
+SELECT 
+    c.name, 
+    COUNT(DISTINCT o.id) AS order_count, 
+    SUM(oi.quantity * p.price), 0.00 AS total_price 
+FROM customers1 c
+LEFT JOIN orders1 o ON o.customer_id = c.id
+LEFT JOIN orders_items1 oi on oi.order_id = o.id
+LEFT JOIN products1 p on p.id = oi.product_id
+GROUP BY c.name
+ORDER BY order_count DESC;
+
+SELECT * FROM vw_customer_orders_count;
