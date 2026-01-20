@@ -113,12 +113,12 @@ CREATE OR REPLACE VIEW vw_customer_orders_count AS
 SELECT 
     c.name, 
     COUNT(DISTINCT o.id) AS order_count, 
-    SUM(oi.quantity * p.price), 0.00 AS total_price 
+    COALESCE(SUM(oi.quantity * p.price), 0.00) AS total_price 
 FROM customers1 c
 LEFT JOIN orders1 o ON o.customer_id = c.id
 LEFT JOIN orders_items1 oi on oi.order_id = o.id
 LEFT JOIN products1 p on p.id = oi.product_id
-GROUP BY c.name
+GROUP BY c.id, c.name
 ORDER BY order_count DESC;
 
 SELECT * FROM vw_customer_orders_count;
